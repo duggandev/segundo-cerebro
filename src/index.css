@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer components {
+  /* Mobile optimizations */
+  body {
+    @apply antialiased;
+  }
+
+  /* Prevent layout shift on mobile */
+  html {
+    @apply scroll-smooth;
+  }
+
+  /* Bottom navigation spacing for mobile */
+  @media (max-width: 1023px) {
+    main {
+      @apply pb-24;
+    }
+  }
+
+  /* Touch-friendly interactions */
+  button, a {
+    @apply active:opacity-75 transition-opacity;
+  }
+}
