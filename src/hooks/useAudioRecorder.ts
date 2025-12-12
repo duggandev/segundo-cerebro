@@ -7,6 +7,8 @@ interface UseAudioRecorderReturn {
   error: string | null;
   isSupported: boolean;
   audioDuration: number;
+  resetDuration: () => void;
+  cleanup: () => void;
 }
 
 export function useAudioRecorder(): UseAudioRecorderReturn {
@@ -80,6 +82,7 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
       // Limpiar intervalo
       if (durationIntervalRef.current) {
         clearInterval(durationIntervalRef.current);
+        durationIntervalRef.current = null;
       }
 
       mediaRecorder.onstop = () => {
@@ -98,6 +101,43 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
     });
   }, []);
 
+  const resetDuration = useCallback(() => {
+    setAudioDuration(0);
+    if (durationIntervalRef.current) {
+      clearInterval(durationIntervalRef.current);
+      durationIntervalRef.current = null;
+    }
+  }, []);
+
+  const cleanup = useCallback(() => {
+    // Limpiar intervalo de duración
+    if (durationIntervalRef.current) {
+      clearInterval(durationIntervalRef.current);
+      durationIntervalRef.current = null;
+    }
+
+    // Abortar media recorder si existe
+    if (mediaRecorderRef.current) {
+      try {
+        mediaRecorderRef.current.stop();
+      } catch (err) {
+        console.warn('Error al detener media recorder:', err);
+      }
+    }
+
+    // Detener stream
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+
+    // Resetear estado
+    setIsRecording(false);
+    setError(null);
+    setAudioDuration(0);
+    audioChunksRef.current = [];
+  }, []);
+
   return {
     isRecording,
     startRecording,
@@ -105,5 +145,7 @@ export function useAudioRecorder(): UseAudioRecorderReturn {
     error,
     isSupported,
     audioDuration,
+    resetDuration,
+    cleanup,
   };
 }

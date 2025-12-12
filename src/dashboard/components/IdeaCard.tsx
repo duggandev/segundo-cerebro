@@ -38,11 +38,6 @@ export default function IdeaCard({ idea, onClick }: IdeaCardProps) {
         </p>
       )}
 
-      {/* Transcripción truncada */}
-      <p className="text-gray-700 text-sm leading-relaxed mb-3">
-        {truncateText(idea.transcription)}
-      </p>
-
       {/* Tags */}
       {idea.tags && idea.tags.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-3">

@@ -73,7 +73,7 @@ export function useIdeas() {
   }, []);
 
   /**
-   * Crea una nueva idea
+   * Crea una nueva idea con texto
    * @param input - Objeto con transcription y duration
    */
   const createIdea = useCallback(
@@ -104,6 +104,43 @@ export function useIdeas() {
         return idea;
       } catch (err) {
         const errorMessage = getErrorMessage(err);
+        setState(prev => ({ ...prev, error: errorMessage }));
+        return null;
+      }
+    },
+    [getToken]
+  );
+
+  /**
+   * Crea una nueva idea con audio
+   * @param input - Objeto con audioBlob y duration
+   */
+  const createIdeaWithAudio = useCallback(
+    async (input: { audioBlob: Blob; duration: number }): Promise<Idea | null> => {
+      try {
+        const { audioBlob, duration } = input;
+
+        setState(prev => ({ ...prev, error: null }));
+        const token = await getToken();
+        if (!token) {
+          throw new Error('No token available');
+        }
+
+        console.log('createIdeaWithAudio: Enviando audio al servidor');
+        const entry = await ideaService.createWithAudio(audioBlob, duration, token);
+        console.log('createIdeaWithAudio: Respuesta del servidor:', entry);
+        const idea = ideaMapper.fromApi(entry);
+
+        // Agregar al inicio de la lista
+        setState(prev => ({
+          ...prev,
+          ideas: [idea, ...prev.ideas],
+        }));
+
+        return idea;
+      } catch (err) {
+        const errorMessage = getErrorMessage(err);
+        console.error('createIdeaWithAudio error:', errorMessage);
         setState(prev => ({ ...prev, error: errorMessage }));
         return null;
       }
@@ -206,6 +243,7 @@ export function useIdeas() {
     loading: state.loading,
     error: state.error,
     createIdea,
+    createIdeaWithAudio,
     updateIdea,
     deleteIdea,
     getIdeaDetails,

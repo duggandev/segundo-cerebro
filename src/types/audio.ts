@@ -4,14 +4,11 @@
 
 export interface RecordingData {
   transcription: string;
-  audioBlob: Blob;
-  audioDuration: number;
+  duration: number;
 }
 
 export interface SpeechRecognitionConfig {
   language?: string;
-  continuous?: boolean;
-  interimResults?: boolean;
 }
 
 export interface UseSpeechRecognitionReturn {
@@ -32,6 +29,8 @@ export interface UseAudioRecorderReturn {
   error: string | null;
   isSupported: boolean;
   audioDuration: number;
+  resetDuration: () => void;
+  cleanup: () => void;
 }
 
 /**

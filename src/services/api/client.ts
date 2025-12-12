@@ -8,6 +8,7 @@ const API_BASE_URL =
 
 export interface FetchOptions extends RequestInit {
   token?: string;
+  isFormData?: boolean;
 }
 
 export class ApiError extends Error {
@@ -28,11 +29,14 @@ export async function apiCall<T>(
   endpoint: string,
   options: FetchOptions = {}
 ): Promise<T> {
-  const { token, ...fetchOptions } = options;
+  const { token, isFormData, ...fetchOptions } = options;
 
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
+  const headers: Record<string, string> = {};
+
+  // Solo setear Content-Type si no es FormData
+  if (!isFormData) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   if (typeof fetchOptions.headers === 'object' && fetchOptions.headers) {
     Object.assign(headers, fetchOptions.headers);

@@ -40,18 +40,27 @@ export const ideaService = {
   },
 
   /**
-   * Crea una nueva idea
+   * Crea una nueva idea con transcripción (texto)
    */
-  async create(
-    input: CreateIdeaInput,
+  async createWithTranscription(
+    transcription: string,
+    duration: number,
     token: string
   ): Promise<ApiEntry> {
+    const input: CreateIdeaInput = {
+      transcription,
+      duration,
+    };
+
     logApiCall('POST', '/entries', input);
 
     const data = await apiCall<ApiResponse>('/entries', {
       token,
       method: 'POST',
       body: JSON.stringify(input),
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
 
     const entry = (data as any).data || data.entry;
@@ -61,6 +70,47 @@ export const ideaService = {
     }
 
     return entry;
+  },
+
+  /**
+   * Crea una nueva idea con archivo de audio
+   */
+  async createWithAudio(
+    audioFile: Blob,
+    duration: number,
+    token: string
+  ): Promise<ApiEntry> {
+    const formData = new FormData();
+    formData.append('audio_file', audioFile, 'recording.webm');
+    formData.append('duration', duration.toString());
+
+    logApiCall('POST', '/entries (audio)', { duration });
+
+    const data = await apiCall<ApiResponse>('/entries', {
+      token,
+      method: 'POST',
+      body: formData,
+      // No setear Content-Type, el navegador lo pone automáticamente
+      isFormData: true,
+    });
+
+    const entry = (data as any).data || data.entry;
+
+    if (!entry) {
+      throw new Error('No entry returned from API');
+    }
+
+    return entry;
+  },
+
+  /**
+   * Crea una nueva idea (método heredado - usa transcripción)
+   */
+  async create(
+    input: CreateIdeaInput,
+    token: string
+  ): Promise<ApiEntry> {
+    return this.createWithTranscription(input.transcription, input.duration, token);
   },
 
   /**
