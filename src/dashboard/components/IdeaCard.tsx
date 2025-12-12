@@ -1,17 +1,6 @@
 import { Mic, Clock, Sparkles } from 'lucide-react';
-
-interface Idea {
-  id: string;
-  transcription: string;
-  audioUrl?: string;
-  audioDuration?: number;
-  createdAt: Date;
-  category: string;
-  aiProcessed: boolean;
-  aiAnalysis?: string;
-  aiSuggestions?: string[];
-  tags?: string[];
-}
+import type { Idea } from '../../types/domain';
+import { formatDate, formatDuration, truncateText } from '../../utils/formatters';
 
 interface IdeaCardProps {
   idea: Idea;
@@ -19,22 +8,6 @@ interface IdeaCardProps {
 }
 
 export default function IdeaCard({ idea, onClick }: IdeaCardProps) {
-  const formatDate = (date: Date) => {
-    const d = new Date(date);
-    return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
-  };
-
-  const formatDuration = (seconds?: number) => {
-    if (!seconds) return '';
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const truncateText = (text: string, maxLines: number = 3) => {
-    const lines = text.split('\n').slice(0, maxLines).join('\n');
-    return lines.length > 150 ? lines.substring(0, 150) + '...' : lines;
-  };
 
   return (
     <button
@@ -57,6 +30,13 @@ export default function IdeaCard({ idea, onClick }: IdeaCardProps) {
           <Sparkles className="w-4 h-4 text-green-500" />
         )}
       </div>
+
+      {/* Título */}
+      {idea.title && (
+        <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+          {idea.title}
+        </p>
+      )}
 
       {/* Transcripción truncada */}
       <p className="text-gray-700 text-sm leading-relaxed mb-3">

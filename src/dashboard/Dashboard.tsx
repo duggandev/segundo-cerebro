@@ -1,51 +1,41 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
-import { useAuth } from '../context/AuthContext';
-import { useLocalStorage } from '../hooks/useLocalStorage';
-import { DEFAULT_IDEAS } from '../constants/defaultIdeas';
-
-interface Idea {
-  id: string;
-  transcription: string;
-  audioUrl?: string;
-  audioDuration?: number;
-  createdAt: Date;
-  category: string;
-  aiProcessed: boolean;
-  aiAnalysis?: string;
-  aiMarkdown?: string;
-  aiSuggestions?: string[];
-  tags?: string[];
-}
+import { useIdeas } from '../hooks/useIdeas';
+import LoadingSpinner from '../components/LoadingSpinner';
+import type { Idea } from '../types/domain';
 
 export default function Dashboard() {
-  const { logout } = useAuth();
-  
-  // Inicializar con datos por defecto si no hay ideas guardadas
-  const [ideasData, setIdeasData] = useLocalStorage<any[]>('ideas', DEFAULT_IDEAS);
+  const { ideas, loading, error, updateIdea, deleteIdea, createIdea, getIdeaDetails } = useIdeas();
 
-  // Convertir las fechas strings a Date objects
-  const ideas = ideasData.map((idea: any) => ({
-    ...idea,
-    createdAt: idea.createdAt instanceof Date ? idea.createdAt : new Date(idea.createdAt)
-  })) as Idea[];
-
-  const updateIdea = (id: string, updates: Partial<Idea>) => {
-    const updatedIdeas = ideas.map((idea: Idea) =>
-      idea.id === id ? { ...idea, ...updates } : idea
+  if (loading) {
+    return (
+      <div className="flex flex-col h-screen bg-gray-50">
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <LoadingSpinner />
+        </div>
+      </div>
     );
-    setIdeasData(updatedIdeas);
-  };
+  }
 
-  const deleteIdea = (id: string) => {
-    const filteredIdeas = ideas.filter((idea: Idea) => idea.id !== id);
-    setIdeasData(filteredIdeas);
-  };
+  if (error) {
+    return (
+      <div className="flex flex-col h-screen bg-gray-50">
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-red-600 font-semibold mb-2">Error al cargar las ideas</p>
+            <p className="text-gray-600">{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-screen bg-gray-50">
-      <Header onLogout={logout} />
+      <Header />
 
       <div className="flex flex-1 overflow-hidden flex-col lg:flex-row">
         {/* Sidebar desktop */}
@@ -54,7 +44,7 @@ export default function Dashboard() {
         </div>
 
         <main className="flex-1 overflow-y-auto p-4 lg:p-8 pb-24 lg:pb-8">
-          <Outlet context={{ ideas, onUpdate: updateIdea, onDelete: deleteIdea }} />
+          <Outlet context={{ ideas, onUpdate: updateIdea, onDelete: deleteIdea, createIdea, getIdeaDetails }} />
         </main>
       </div>
 

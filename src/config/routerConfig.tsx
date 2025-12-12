@@ -3,44 +3,34 @@ import { lazy, Suspense } from 'react';
 import { ROUTES } from '../constants/routes';
 import { PrivateRoute } from '../components/PrivateRoute';
 import LoadingSpinner from '../components/LoadingSpinner';
+import LandingPage from '../landing/LandingPage';
 
-// Importación lazy de componentes para code-splitting
-const LandingPage = lazy(() => import('../landing/LandingPage'));
-const LoginPage = lazy(() => import('../pages/LoginPage'));
+// Lazy loading para componentes
+const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
 const Dashboard = lazy(() => import('../dashboard/Dashboard'));
 const Inicio = lazy(() => import('../dashboard/pages/inicio/Inicio'));
 const DashboardPage = lazy(() => import('../dashboard/pages/dashboard/DashboardPage'));
-const Reportes = lazy(() => import('../dashboard/pages/reportes/Reportes'));
+const Archivados = lazy(() => import('../dashboard/pages/archivados/Archivados'));
 const Beneficios = lazy(() => import('../dashboard/pages/beneficios/Beneficios'));
 const Ajustes = lazy(() => import('../dashboard/pages/ajustes/Ajustes'));
+const ProfilePage = lazy(() => import('../dashboard/pages/ajustes/ProfilePage'));
 
 // Wrapper para Suspense
-const withSuspense = (Component: React.ComponentType<any>, props?: any) => (
+const withSuspense = (Component: React.ComponentType<any>) => (
   <Suspense fallback={<LoadingSpinner />}>
-    <Component {...props} />
+    <Component />
   </Suspense>
 );
 
 /**
- * Rutas públicas de la aplicación
+ * Rutas públicas
  */
-export const publicRoutes: RouteObject[] = [
-  {
-    path: ROUTES.LANDING,
-    element: withSuspense(LandingPage),
-    errorElement: <div className="p-8 text-center text-red-600">Error al cargar la página</div>,
-  },
-  {
-    path: ROUTES.LOGIN,
-    element: withSuspense(LoginPage),
-    errorElement: <div className="p-8 text-center text-red-600">Error al cargar el login</div>,
-  },
-];
+const publicRoutes: RouteObject[] = [];
 
 /**
- * Rutas privadas de la aplicación
+ * Rutas privadas
  */
-export const privateRoutes: RouteObject[] = [
+const privateRoutes: RouteObject[] = [
   {
     path: ROUTES.HOME,
     element: (
@@ -48,10 +38,13 @@ export const privateRoutes: RouteObject[] = [
         {withSuspense(Dashboard)}
       </PrivateRoute>
     ),
-    errorElement: <div className="p-8 text-center text-red-600">Error al cargar el dashboard</div>,
     children: [
       {
         index: true,
+        element: withSuspense(Inicio),
+      },
+      {
+        path: 'idea/:ideaId',
         element: withSuspense(Inicio),
       },
     ],
@@ -63,7 +56,6 @@ export const privateRoutes: RouteObject[] = [
         {withSuspense(Dashboard)}
       </PrivateRoute>
     ),
-    errorElement: <div className="p-8 text-center text-red-600">Error al cargar el dashboard</div>,
     children: [
       {
         index: true,
@@ -78,11 +70,10 @@ export const privateRoutes: RouteObject[] = [
         {withSuspense(Dashboard)}
       </PrivateRoute>
     ),
-    errorElement: <div className="p-8 text-center text-red-600">Error al cargar el dashboard</div>,
     children: [
       {
         index: true,
-        element: withSuspense(Reportes),
+        element: withSuspense(Archivados),
       },
     ],
   },
@@ -93,7 +84,6 @@ export const privateRoutes: RouteObject[] = [
         {withSuspense(Dashboard)}
       </PrivateRoute>
     ),
-    errorElement: <div className="p-8 text-center text-red-600">Error al cargar el dashboard</div>,
     children: [
       {
         index: true,
@@ -108,32 +98,31 @@ export const privateRoutes: RouteObject[] = [
         {withSuspense(Dashboard)}
       </PrivateRoute>
     ),
-    errorElement: <div className="p-8 text-center text-red-600">Error al cargar el dashboard</div>,
     children: [
       {
         index: true,
         element: withSuspense(Ajustes),
+      },
+      {
+        path: 'perfil',
+        element: withSuspense(ProfilePage),
       },
     ],
   },
 ];
 
 /**
- * Todas las rutas combinadas
+ * Todas las rutas
  */
 export const appRoutes: RouteObject[] = [
+  {
+    path: ROUTES.LANDING,
+    element: <LandingPage />,
+  },
   ...publicRoutes,
   ...privateRoutes,
   {
     path: '*',
-    element: (
-      <div className="flex flex-col items-center justify-center h-screen">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">404</h1>
-        <p className="text-gray-600 mb-6">Página no encontrada</p>
-        <a href={ROUTES.LANDING} className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-          Volver al inicio
-        </a>
-      </div>
-    ),
+    element: withSuspense(NotFoundPage),
   },
 ];

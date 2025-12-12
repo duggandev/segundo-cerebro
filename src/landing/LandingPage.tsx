@@ -1,8 +1,22 @@
-import { Brain, Mic, Tag, Sparkles } from 'lucide-react';
-import { useNavigation } from '../hooks/useNavigation';
+import { Brain, Mic, Tag, Sparkles, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { SignIn, SignUp } from '@clerk/clerk-react';
+import { ROUTES } from '../constants/routes';
+import { useAuth } from '../context/AuthContext';
 
 export default function LandingPage() {
-  const { goToLogin } = useNavigation();
+  const navigate = useNavigate();
+  const { isAuthenticated, isLoading } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
+
+  // Si el usuario está autenticado, redirigir al dashboard
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      navigate(ROUTES.HOME, { replace: true });
+    }
+  }, [isAuthenticated, isLoading, navigate]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -12,7 +26,7 @@ export default function LandingPage() {
           <span className="text-xl font-bold text-gray-800">Segundo Cerebro</span>
         </div>
         <button
-          onClick={goToLogin}
+          onClick={() => setShowAuthModal(true)}
           className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
         >
           Comenzar
@@ -30,7 +44,7 @@ export default function LandingPage() {
             Nuestra IA los procesa y organiza automáticamente para que nunca pierdas una idea brillante.
           </p>
           <button
-            onClick={goToLogin}
+            onClick={() => setShowAuthModal(true)}
             className="px-8 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-lg font-semibold inline-flex items-center gap-2"
           >
             <Sparkles className="w-5 h-5" />
@@ -78,10 +92,106 @@ export default function LandingPage() {
 
       <footer className="container mx-auto px-6 py-8 border-t border-gray-200 mt-20">
         <div className="text-center text-gray-600">
-          <p className="mb-2">Desarrollado con pasión por <span className="font-semibold text-gray-900">Luis Zamora</span></p>
-          <p className="text-sm">Gratis para la comunidad</p>
+          <p>&copy; 2025 Segundo Cerebro. Todos los derechos reservados.</p>
         </div>
       </footer>
+
+      {/* Modal de Autenticación - SignIn y SignUp */}
+      {showAuthModal && (
+        <>
+          {/* Overlay oscuro */}
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            onClick={() => setShowAuthModal(false)}
+          />
+          
+          {/* Modal con SignIn o SignUp */}
+          <div className="fixed inset-0 flex items-center justify-center p-4 z-50 pointer-events-none">
+            <div className="pointer-events-auto relative">
+              {/* Botón cerrar pegado al modal */}
+              <button
+                onClick={() => setShowAuthModal(false)}
+                className="absolute -top-3 -right-3 p-2 bg-white hover:bg-gray-100 rounded-full shadow-lg transition-colors z-50"
+              >
+                <X className="w-5 h-5 text-gray-600" />
+              </button>
+
+              {authMode === 'signin' ? (
+                <div>
+                  <SignIn
+                    appearance={{
+                      elements: {
+                        formButtonPrimary:
+                          'bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-lg w-full transition-all duration-200 shadow-md hover:shadow-lg',
+                        card: 'shadow-xl border-0',
+                        headerTitle: 'text-2xl font-bold text-gray-900',
+                        headerSubtitle: 'text-gray-600',
+                        socialButtonsBlockButton:
+                          'border border-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-all',
+                        formFieldInput:
+                          'border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all',
+                        footerActionLink: 'text-blue-600 hover:text-blue-700 font-medium',
+                      },
+                      layout: {
+                        socialButtonsPlacement: 'bottom',
+                        privacyPageUrl: '/privacy',
+                        termsPageUrl: '/terms',
+                      },
+                    }}
+                    forceRedirectUrl={ROUTES.HOME}
+                    redirectUrl={ROUTES.HOME}
+                  />
+                  <div className="mt-4 text-center text-sm text-gray-600">
+                    ¿No tienes cuenta?{' '}
+                    <button
+                      onClick={() => setAuthMode('signup')}
+                      className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                    >
+                      Registrate aquí
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <SignUp
+                    appearance={{
+                      elements: {
+                        formButtonPrimary:
+                          'bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-lg w-full transition-all duration-200 shadow-md hover:shadow-lg',
+                        card: 'shadow-xl border-0',
+                        headerTitle: 'text-2xl font-bold text-gray-900',
+                        headerSubtitle: 'text-gray-600',
+                        socialButtonsBlockButton:
+                          'border border-gray-300 hover:border-gray-400 hover:bg-gray-50 transition-all',
+                        formFieldInput:
+                          'border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all',
+                        footerActionLink: 'text-blue-600 hover:text-blue-700 font-medium',
+                      },
+                      layout: {
+                        socialButtonsPlacement: 'bottom',
+                        privacyPageUrl: '/privacy',
+                        termsPageUrl: '/terms',
+                      },
+                    }}
+                    forceRedirectUrl={ROUTES.HOME}
+                    redirectUrl={ROUTES.HOME}
+                  />
+                  <div className="mt-4 text-center text-sm text-gray-600">
+                    ¿Ya tienes cuenta?{' '}
+                    <button
+                      onClick={() => setAuthMode('signin')}
+                      className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                    >
+                      Inicia sesión
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
+

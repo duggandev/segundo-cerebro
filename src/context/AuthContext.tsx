@@ -1,52 +1,44 @@
 /**
- * Contexto de Autenticación
- * Gestiona el estado de autenticación global de la aplicación
+ * Contexto de Autenticación con Clerk
  */
 
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { createContext, ReactNode, useContext } from 'react';
+import { useUser } from '@clerk/clerk-react';
+import type { User } from '@clerk/clerk-react';
 
 interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (success: boolean) => void;
-  logout: () => void;
+  user: User | null;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const { user, isLoaded } = useUser();
 
-  // Verificar autenticación al cargar la app
-  useEffect(() => {
-    const auth = localStorage.getItem('isAuthenticated');
-    setIsAuthenticated(auth === 'true');
-    setIsLoading(false);
-  }, []);
+  const isAuthenticated = !!user;
+  const isLoading = !isLoaded;
 
-  const login = (success: boolean) => {
-    if (success) {
-      setIsAuthenticated(true);
-      localStorage.setItem('isAuthenticated', 'true');
-    }
-  };
-
-  const logout = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem('isAuthenticated');
+  const handleSignOut = async () => {
+    // Clerk maneja signOut automáticamente con UserButton
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, isLoading, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        isAuthenticated,
+        isLoading,
+        user,
+        signOut: handleSignOut,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 }
 
-/**
- * Hook para usar el contexto de autenticación
- */
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {

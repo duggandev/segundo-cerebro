@@ -13,7 +13,7 @@ export enum ROUTES {
   // Dashboard pages
   HOME = '/inicio',
   ANALYTICS = '/analytics',
-  REPORTS = '/reportes',
+  REPORTS = '/archivados',
   BENEFITS = '/beneficios',
   SETTINGS = '/ajustes',
 }
@@ -23,7 +23,6 @@ export enum ROUTES {
  */
 export const PUBLIC_ROUTES = [
   ROUTES.LANDING,
-  ROUTES.LOGIN,
 ];
 
 /**

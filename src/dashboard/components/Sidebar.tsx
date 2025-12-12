@@ -1,4 +1,4 @@
-import { Home, LayoutDashboard, BarChart3, Gift, Settings } from 'lucide-react';
+import { Home, LayoutDashboard, Archive, Gift, Settings } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
 
@@ -16,7 +16,7 @@ export default function Sidebar({ isMobile = false }: SidebarProps) {
   const navItems = [
     { to: ROUTES.HOME, icon: Home, label: 'Inicio' },
     { to: ROUTES.ANALYTICS, icon: LayoutDashboard, label: 'Dashboard' },
-    { to: ROUTES.REPORTS, icon: BarChart3, label: 'Reportes' },
+    { to: ROUTES.REPORTS, icon: Archive, label: 'Archivados' },
     { to: ROUTES.BENEFITS, icon: Gift, label: 'Beneficios' },
     { to: ROUTES.SETTINGS, icon: Settings, label: 'Ajustes' },
   ];

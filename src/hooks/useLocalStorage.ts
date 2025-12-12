@@ -14,7 +14,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       }
       return initialValue;
     } catch (error) {
-      console.error(`Error al leer localStorage[${key}]:`, error);
+      // Error silencioso - usar valor inicial
       return initialValue;
     }
   });
@@ -26,7 +26,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       setStoredValue(valueToStore);
       window.localStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
-      console.error(`Error al escribir en localStorage[${key}]:`, error);
+      // Error silencioso - continuar sin localStorage
     }
   };
 
@@ -37,7 +37,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
         try {
           setStoredValue(JSON.parse(event.newValue));
         } catch (error) {
-          console.error(`Error al sincronizar localStorage[${key}]:`, error);
+          // Error silencioso - mantener estado actual
         }
       }
     };

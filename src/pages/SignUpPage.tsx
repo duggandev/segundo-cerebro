@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUser, SignIn } from '@clerk/clerk-react';
+import { useUser, SignUp } from '@clerk/clerk-react';
 import { Brain } from 'lucide-react';
 import { ROUTES } from '../constants/routes';
 
-export default function LoginPage() {
+export default function SignUpPage() {
   const { isSignedIn, isLoaded } = useUser();
   const navigate = useNavigate();
 
@@ -39,12 +39,12 @@ export default function LoginPage() {
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent mb-2">
             Segundo Cerebro
           </h1>
-          <p className="text-gray-600 text-lg">Gestiona tus ideas inteligentemente</p>
+          <p className="text-gray-600 text-lg">Crea tu cuenta y comienza</p>
         </div>
 
-        {/* Componente de SignIn de Clerk */}
+        {/* Componente de SignUp de Clerk */}
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-          <SignIn
+          <SignUp
             appearance={{
               elements: {
                 formButtonPrimary:
@@ -64,6 +64,7 @@ export default function LoginPage() {
                 termsPageUrl: '/terms',
               },
             }}
+            signInUrl={ROUTES.LOGIN}
             forceRedirectUrl={ROUTES.HOME}
             redirectUrl={ROUTES.HOME}
           />
