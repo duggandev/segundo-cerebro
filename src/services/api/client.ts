@@ -33,13 +33,14 @@ export async function apiCall<T>(
 
   const headers: Record<string, string> = {};
 
-  // Solo setear Content-Type si no es FormData
-  if (!isFormData) {
-    headers['Content-Type'] = 'application/json';
-  }
-
+  // Si los headers ya vienen en fetchOptions, usarlos primero
   if (typeof fetchOptions.headers === 'object' && fetchOptions.headers) {
     Object.assign(headers, fetchOptions.headers);
+  }
+
+  // Solo setear Content-Type si no es FormData y no está ya definido
+  if (!isFormData && !headers['Content-Type']) {
+    headers['Content-Type'] = 'application/json';
   }
 
   if (token) {
@@ -85,5 +86,22 @@ export function logApiCall(
 ) {
   if (import.meta.env.DEV) {
     console.log(`[API] ${method} ${endpoint}`, data);
+  }
+}
+
+/**
+ * Helper para logs detallados de requests
+ */
+export function logApiRequest(
+  method: string,
+  endpoint: string,
+  headers?: Record<string, string>,
+  body?: unknown
+) {
+  if (import.meta.env.DEV) {
+    console.log(`[API Request] ${method} ${endpoint}`, {
+      headers,
+      body,
+    });
   }
 }

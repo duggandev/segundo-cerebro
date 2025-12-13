@@ -52,7 +52,7 @@ export const ideaService = {
       duration,
     };
 
-    logApiCall('POST', '/entries', input);
+    logApiCall('POST', '/entries (text)', input);
 
     const data = await apiCall<ApiResponse>('/entries', {
       token,

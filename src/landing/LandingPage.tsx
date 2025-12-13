@@ -1,4 +1,4 @@
-import { Brain, Mic, Tag, Sparkles, X } from 'lucide-react';
+import { Mic, Tag, Sparkles, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { SignIn, SignUp } from '@clerk/clerk-react';
@@ -21,9 +21,9 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
       <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <Brain className="w-8 h-8 text-blue-600" />
-          <span className="text-xl font-bold text-gray-800">Segundo Cerebro</span>
+        <div className="flex items-center gap-1">
+          <img src="/images/icon-192.png" alt="Logo oti" className="w-8 h-8 rounded-lg object-cover" />
+          <span className="text-2xl font-bold text-gray-800">oti</span>
         </div>
         <button
           onClick={() => setShowAuthModal(true)}
@@ -70,7 +70,7 @@ export default function LandingPage() {
 
           <div className="bg-gray-50 p-8 rounded-xl">
             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-              <Brain className="w-6 h-6 text-blue-600" />
+              <img src="/images/icon-192.png" alt="Logo oti" className="w-6 h-6 rounded object-cover" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 mb-3">Procesamiento IA</h3>
             <p className="text-gray-600">
@@ -92,7 +92,7 @@ export default function LandingPage() {
 
       <footer className="container mx-auto px-6 py-8 border-t border-gray-200 mt-20">
         <div className="text-center text-gray-600">
-          <p>&copy; 2025 Segundo Cerebro. Todos los derechos reservados.</p>
+          <p>&copy; 2025 Noti. Creador Luis Zamora. Todos los derechos reservados.</p>
         </div>
       </footer>
 

@@ -14,6 +14,7 @@ interface ProcessingIdea {
   progress?: number;
 }
 
+
 interface ContextType {
   ideas: Idea[];
   onUpdate: (id: string, updates: Partial<Idea>) => void;
@@ -21,10 +22,16 @@ interface ContextType {
   createIdea: (input: { transcription: string; duration: number }) => Promise<Idea | null>;
   createIdeaWithAudio: (input: { audioBlob: Blob; duration: number }) => Promise<Idea | null>;
   getIdeaDetails: (id: string) => Promise<Idea | null>;
+  search?: string;
 }
 
-export default function Inicio() {
-  const { ideas, onDelete, createIdea, createIdeaWithAudio, getIdeaDetails } = useOutletContext<ContextType>();
+interface InicioProps {
+  search?: string;
+}
+
+export default function Inicio({ search }: InicioProps) {
+  const { ideas, onDelete, createIdea, createIdeaWithAudio, getIdeaDetails, search: contextSearch } = useOutletContext<ContextType>();
+  const searchValue = typeof search === 'string' ? search : contextSearch || '';
   const { ideaId } = useParams<{ ideaId?: string }>();
   const navigate = useNavigate();
   const [selectedIdeaId, setSelectedIdeaId] = useState<string | null>(null);
@@ -163,6 +170,14 @@ export default function Inicio() {
     );
   }
 
+  // Filtrar ideas según búsqueda
+  const filteredIdeas = searchValue && searchValue.trim().length > 0
+    ? ideas.filter(idea =>
+        idea.transcription?.toLowerCase().includes(searchValue.toLowerCase()) ||
+        idea.title?.toLowerCase().includes(searchValue.toLowerCase())
+      )
+    : ideas;
+
   return (
     <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 lg:ml-auto lg:mr-0 lg:pr-8">
       {/* Header */}
@@ -180,7 +195,7 @@ export default function Inicio() {
           </p>
         </div>
         <span className="text-xs sm:text-sm text-gray-500 font-medium">
-          {ideas.length} {ideas.length === 1 ? 'idea' : 'ideas'}
+          {filteredIdeas.length} {filteredIdeas.length === 1 ? 'idea' : 'ideas'}
         </span>
       </div>
 
@@ -190,9 +205,9 @@ export default function Inicio() {
       )}
 
       {/* Ideas de la categoría seleccionada */}
-      {ideas.length > 0 ? (
+      {filteredIdeas.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
-          {ideas.map((idea) => (
+          {filteredIdeas.map((idea) => (
             <IdeaCard
               key={idea.id}
               idea={idea as any}
@@ -203,7 +218,7 @@ export default function Inicio() {
       ) : (
         <div className="text-center py-8 sm:py-12">
           <p className="text-gray-500 text-base sm:text-lg">
-            No hay ideas aún. ¡Comienza capturando tu primera idea!
+            No hay ideas que coincidan con tu búsqueda.
           </p>
         </div>
       )}
